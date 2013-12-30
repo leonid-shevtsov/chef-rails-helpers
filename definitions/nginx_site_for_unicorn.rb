@@ -1,4 +1,15 @@
-# Name - the name of the app. Must be a valid filename
+# Set up a NGINX site record for a Unicorn-based Ruby on Rails site
+#
+# For this to work, Unicorn should be available on /tmp/`name`-unicorn.sock
+#
+# Assumes nginx is already installed on the server.
+#
+# * name (required) - name of the app
+# * server_name - domain name for the app's virtual host (default is taken from node['hostnames'][`name`][0])
+# * alternate_names - these domain names will 301 redirect to the `server_name`(default is taken from node['hostnames'][`name`][1..-1])
+# * port - port to listen on (default is "80")
+# * public_path - path to the public directory of the app for asset serving (default is "/home/`name`/apps/`name`/current/public")
+
 define :nginx_site_for_unicorn, {
   :name => nil,
   :server_name => nil,

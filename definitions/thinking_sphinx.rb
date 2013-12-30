@@ -1,4 +1,16 @@
-# Name - the name of the app. Must be a valid filename
+# Thinking Sphinx for a Rails app
+#
+# Provides configuration files and directories. Creates an init.d daemon for searchd, that starts on system reboot.
+#
+# Daemon `name`-sphinx can be controlled by root and by the app owner.
+#
+# Assumes that Sphinx is already installed on the server, and thinking_sphinx v3 is installed in the app.
+#
+# * name (required) - name of the app
+# * app_path - path to the app (default is "/home/`owner`/apps/`name`")
+# * rails_env - environment of the app (default is "production")
+# * port - port for the searchd daemon; default is to start from 9312 and increment by 1 for each new searchd instance (so multiple instances on one server are supported)
+# * owner and group - owner and group of the app
 define :thinking_sphinx, {
   :name => nil,
   :app_path => nil,

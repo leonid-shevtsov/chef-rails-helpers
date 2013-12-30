@@ -1,3 +1,9 @@
+# Logrotate configuration for a a Rails app
+#
+# Assumes logrotate is already installed on the server
+#
+# * name (required) - name of the app
+# * log_path - path to the logs to be rotated. default is "/home/`name`/apps/`name`/shared/log"
 define :rails_log_rotate, {
   :name => nil,
   :log_path => nil,

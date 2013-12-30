@@ -1,3 +1,15 @@
+# Sets up a database.yml file for Ruby on Rails, given the usual set of options
+# * name (required) - name of the app
+# * path (required) - path to the containing directory for the database.yml file
+# * owner - owner of the file (default same as `name')
+# * owner - owner group of the file (default same as `name')
+# * environments - contents of the database.yml file
+# * if there's only one `production` environment, define these options on the top level and don't define the `environments` hash:
+# * * adapter (default is "mysql2")
+# * * encoding (default is "utf8")
+# * * database (default same as `name`)
+# * * username (default same as `database`)
+# * * password (default is blank)
 define :database_yml, {
   :name => nil,
   :path => nil,

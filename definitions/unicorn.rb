@@ -1,3 +1,17 @@
+# Unicorn init.d daemon for a Rails app
+#
+# Generates a configuration file for unicorn and the daemon control script.
+#
+# Daemon /etc/init.d/`name`-unicorn can be controlled by root and by the app owner.
+#
+# Assumes unicorn gem is included in the app.
+#
+# * name (required) - name of the app
+# * app_path - path to the app, default is "/home/`name`/apps/`name`"
+# * config_path - where to put the config file, default is "`app_path`/shared"
+# * environment - environment to run, default is "production"
+# * worker_processes - number of worker processes to run, default is "2"
+# * owner and group - owner and group of the app
 define :unicorn, {
   :name => nil,
   :app_path => nil,
