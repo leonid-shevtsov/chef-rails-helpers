@@ -1,0 +1,66 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          <%=@app_name%>-unicorn
+# Required-Start:    $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Unicorn HTTP server for <%=@app_name%> Ruby application
+# Description: http://unicorn.bogomips.org/
+### END INIT INFO
+
+set -e
+set -u
+
+# Setup variables
+APP_PATH=<%=@app_path %>
+APP_CURRENT=$APP_PATH/current
+UNICORN_CONFIG=$APP_PATH/shared/unicorn.rb
+# TODO better place for PID is in /var/run
+PID=$APP_PATH/shared/tmp/pids/unicorn.pid
+RACK_ENV=<%=@environment%>
+USER="<%=@owner %>"
+
+# Assemble the command line for Unicorn
+UNICORN_COMMAND="/bin/bash -c 'source /etc/profile.d/rvm.sh; cd $APP_CURRENT && bundle exec unicorn --config-file $UNICORN_CONFIG --env $RACK_ENV --daemonize'"
+# Unless current user is the app user, swith to the app user before running the command
+if [ "$USER" != `/usr/bin/whoami` ]; then
+  UNICORN_COMMAND="sudo -u $USER -- $UNICORN_COMMAND"
+fi
+
+sig () {
+  test -s "$PID" && kill -$1 `cat "$PID"`
+}
+
+case $1 in
+  start)
+    sig 0 && echo >&2 "Already running" && exit
+    echo "Starting"
+    eval "$UNICORN_COMMAND"
+    ;;
+  stop)
+    sig QUIT && echo "Stopping" && exit
+    echo >&2 "Not running"
+    ;;
+  force-stop)
+    sig TERM && echo "Forcing a stop" && exit
+    echo >&2 "Not running"
+    ;;
+  restart|reload|upgrade)
+    # Zero-downtime worker rotation is implemented inside Unicorn itself
+    sig USR2 && echo Reloaded && exit
+    echo >&2 "Couldn't reload, starting '$UNICORN_COMMAND' instead"
+    eval "$UNICORN_COMMAND"
+    ;;
+  rotate)
+    sig USR1 && echo Rotated logs OK && exit
+    echo >&2 "Couldn't rotate logs" && exit
+    ;;
+  status)
+    sig 0 && echo >&2 "Already running" && exit
+    echo >&2 "Not running" && exit
+    ;;
+  *)
+    echo >&2 "Usage: $0 <start|stop|restart|reload|status|upgrade|rotate|force-stop>"
+    exit
+    ;;
+  esac

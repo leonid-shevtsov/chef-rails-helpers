@@ -1,0 +1,7 @@
+<%=@rails_env%>:
+  configuration_file: "<%=@app_path %>/shared/<%=@rails_env%>.sphinx.conf"
+  log: "<%=@app_path %>/shared/log/searchd.log"
+  query_log: "<%=@app_path %>/shared/log/searchd.query.log"
+  pid_file: "<%=@app_path %>/shared/tmp/pids/searchd.pid"
+  morphology: stem_enru
+  mysql41: <%=@port %>

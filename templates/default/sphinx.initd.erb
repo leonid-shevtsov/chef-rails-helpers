@@ -1,0 +1,63 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          <%=@app_name%>-sphinx
+# Required-Start:    $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: sphinx initscript for <%=@app_name%>
+# Description:       Sphinx is a full-text search engine
+### END INIT INFO
+
+set -e
+set -u
+
+RAILS_ENV=<%=@rails_env %>
+RAILS_ROOT=<%=@app_path %>/current
+PID=$RAILS_ROOT/tmp/pids/searchd.pid
+USER="<%=@owner %>"
+
+START_COMMAND="bundle exec rake ts:start RAILS_ENV=$RAILS_ENV"
+STOP_COMMAND="bundle exec rake ts:stop RAILS_ENV=$RAILS_ENV"
+RESTART_COMMAND="bundle exec rake ts:restart RAILS_ENV=$RAILS_ENV"
+
+sig () {
+  test -s "$PID" && kill -$1 `cat "$PID"`
+}
+
+run_command() {
+  CMD="cd $RAILS_ROOT && $*"
+  CMD="/bin/bash -c 'source /etc/profile.d/rvm.sh; $CMD'"
+  if [ "$USER" != `whoami` ]; then
+    CMD="sudo -u $USER -- $CMD"
+  fi
+  eval "$CMD"
+}
+
+case $1 in
+  start)
+    sig 0 && echo >&2 "Already running" && exit
+    echo "Starting"
+    run_command $START_COMMAND
+    ;;
+  stop)
+    run_command $STOP_COMMAND && echo "Stopping" && exit
+    echo >&2 "Not running"
+    ;;
+  restart|reload)
+    run_command $RESTART_COMMAND && echo Reloaded && exit
+    echo >&2 "Couldn't reload, starting instead"
+    run_command $START_COMMAND
+    ;;
+  rotate)
+    sig USR1 && echo Rotated logs OK && exit
+    echo >&2 "Couldn't rotate logs" && exit
+    ;;
+  status)
+    sig 0 && echo >&2 "Already running" && exit
+    echo >&2 "Not running" && exit
+    ;;
+  *)
+    echo >&2 "Usage: $0 <start|stop|restart|reload|status|upgrade|rotate|force-stop>"
+    exit
+    ;;
+  esac

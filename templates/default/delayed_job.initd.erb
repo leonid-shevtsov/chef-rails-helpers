@@ -1,0 +1,64 @@
+#!/bin/bash
+### BEGIN INIT INFO
+# Provides:          <%=@app_name%>-delayed_job
+# Required-Start:    $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: delayed job initscript for <%=@app_name%>
+# Description:       Delayed Job is a job queue for Rails
+### END INIT INFO
+
+set -e
+set -u
+
+RAILS_ENV=<%=@rails_env %>
+RAILS_ROOT=<%=@app_path %>/current
+PID=$RAILS_ROOT/tmp/pids/delayed_job.pid
+USER="<%=@owner %>"
+WORKER_COUNT=<%=@worker_count%>
+
+START_COMMAND="RAILS_ENV=$RAILS_ENV bundle exec script/delayed_job -n $WORKER_COUNT start"
+STOP_COMMAND="RAILS_ENV=$RAILS_ENV bundle exec script/delayed_job stop"
+RESTART_COMMAND="RAILS_ENV=$RAILS_ENV bundle exec script/delayed_job -n $WORKER_COUNT restart"
+
+sig () {
+  test -s "$PID" && kill -$1 `cat "$PID"`
+}
+
+run_command() {
+  CMD="cd $RAILS_ROOT && $*"
+  CMD="/bin/bash -c 'source /etc/profile.d/rvm.sh; $CMD'"
+  if [ "$USER" != `whoami` ]; then
+    CMD="sudo -u $USER -- $CMD"
+  fi
+  eval "$CMD"
+}
+
+case $1 in
+  start)
+    sig 0 && echo >&2 "Already running" && exit
+    echo "Starting"
+    run_command $START_COMMAND
+    ;;
+  stop)
+    run_command $STOP_COMMAND && echo "Stopping" && exit
+    echo >&2 "Not running"
+    ;;
+  restart|reload)
+    run_command $RESTART_COMMAND && echo Reloaded && exit
+    echo >&2 "Couldn't reload, starting instead"
+    run_command $START_COMMAND
+    ;;
+  rotate)
+    sig USR1 && echo Rotated logs OK && exit
+    echo >&2 "Couldn't rotate logs" && exit
+    ;;
+  status)
+    sig 0 && echo >&2 "Already running" && exit
+    echo >&2 "Not running" && exit
+    ;;
+  *)
+    echo >&2 "Usage: $0 <start|stop|restart|reload|status|upgrade|rotate|force-stop>"
+    exit
+    ;;
+  esac

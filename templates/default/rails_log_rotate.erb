@@ -1,0 +1,9 @@
+<%=@log_path%>/*.log {
+  weekly
+  missingok
+  rotate 10
+  compress
+  delaycompress
+  notifempty
+  copytruncate
+}
