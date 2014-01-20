@@ -9,6 +9,8 @@ server {
 
   root   <%= @public_path %>;
 
+  <%= @custom_config %>
+
   try_files $uri @unicorn;
 
   location @unicorn {

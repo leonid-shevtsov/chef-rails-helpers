@@ -15,7 +15,8 @@ define :nginx_site_for_unicorn, {
   :server_name => nil,
   :altername_names => nil,
   :public_path => nil,
-  :port => 80
+  :port => 80,
+  :custom_config => ""
   } do
 
   app_name = params[:name]
@@ -23,10 +24,11 @@ define :nginx_site_for_unicorn, {
   alternate_names = Array(params[:alternate_names] || node['hostnames'][app_name][1..-1])
   public_path = params[:public_path] || "/home/#{app_name}/apps/#{app_name}/current/public"
   port = params[:port] || nil
+  custom_config = params[:custom_config]
 
   template "/etc/nginx/sites-available/#{app_name}" do
     source "nginx_site_for_unicorn.erb"
-    variables :app_name => app_name, :server_name => server_name, :alternate_names => alternate_names, :public_path => public_path, :port => port
+    variables :app_name => app_name, :server_name => server_name, :alternate_names => alternate_names, :public_path => public_path, :port => port, :custom_config => custom_config
     cookbook 'rails_helpers'
   end
 
