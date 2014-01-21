@@ -13,6 +13,6 @@ define :airbrake_deploy_notification, {
     host = params[:host] || node[:airbrake][name][:host] || 'airbrake.io'
 
     bash "airbrake deploy notification for #{name}" do
-      code %Q{cd #{path} && curl -d "api_key=#{key}&deploy[rails_env]=#{environment}&deploy[scm_revision]=`git rev-parse HEAD`&deploy[scm_repository]=`git config --get remote.origin.url`" http://#{host}/deploys}
+      code %Q{cd #{path} && curl -d "api_key=#{key}&deploy[rails_env]=#{environment}&deploy[scm_revision]=`git rev-parse HEAD`&deploy[scm_repository]=`git config --get remote.origin.url`" http://#{host}/deploys.txt}
     end
 end
