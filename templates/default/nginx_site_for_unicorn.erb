@@ -12,10 +12,18 @@ server {
   <%= @custom_config %>
 
   try_files $uri @unicorn;
+  # enable gzip compression
   gzip on;
   gzip_comp_level 9;
   gzip_types text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
   gzip_static on;
+  # proper caching for assets
+  location ~ ^/assets/ {
+    expires 1y;
+    add_header Cache-Control public;
+    add_header ETag "";
+    break;
+  }
 
   location @unicorn {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
