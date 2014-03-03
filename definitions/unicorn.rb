@@ -75,12 +75,6 @@ define :unicorn, {
       source "unicorn.monit.erb"
       variables :app_name => name
       cookbook 'rails_helpers'
-      notifies :run, "execute[enable-monit-#{name}-unicorn]", :immediately
-    end
-
-    execute "enable-monit-#{name}-unicorn" do
-      command "monit monitor #{name}-unicorn; sleep 1"
-      action :nothing
     end
   end
 end
