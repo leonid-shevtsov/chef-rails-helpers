@@ -80,7 +80,12 @@ define :thinking_sphinx, {
       source "sphinx.monit.erb"
       variables :app_name => app_name
       cookbook 'rails_helpers'
-      notifies :restart, 'service[monit]'
+      notifies :run, "execute[enable-monit-#{app_name}-sphinx]", :immediately
+    end
+
+    execute "enable-monit-#{app_name}-sphinx" do
+      command "monit monitor #{app_name}-sphinx"
+      action :nothing
     end
   end
 end
