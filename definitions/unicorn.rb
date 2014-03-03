@@ -12,6 +12,8 @@
 # * environment - environment to run, default is "production"
 # * worker_processes - number of worker processes to run, default is "2"
 # * owner and group - owner and group of the app
+# * rvm - set up for system-wide RVM or not; default is false
+# * monit - set to false to not generate Monit configuration. Default is true
 define :unicorn, {
   :name => nil,
   :app_path => nil,
@@ -20,7 +22,8 @@ define :unicorn, {
   :group => nil,
   :environment => 'production',
   :worker_processes => 2,
-  :rvm => false
+  :rvm => false,
+  :monit => true
   } do
 
   name = params[:name]
@@ -64,5 +67,15 @@ define :unicorn, {
     action :enable
   end
 
-  # TODO monit (optional)
+  if params[:monit]
+    template "/etc/monit/conf.d/#{app_name}-unicorn.conf" do
+      owner 'root'
+      group 'root'
+      mode 0700
+      source "unicorn.monit.erb"
+      variables :app_name => app_name
+      cookbook 'rails_helpers'
+      notifies :restart, 'service[monit]'
+    end
+  end
 end

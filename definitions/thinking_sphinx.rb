@@ -11,13 +11,15 @@
 # * rails_env - environment of the app (default is "production")
 # * port - port for the searchd daemon; default is to start from 9312 and increment by 1 for each new searchd instance (so multiple instances on one server are supported)
 # * owner and group - owner and group of the app
+# * monit - set to false to not generate Monit configuration. Default is true
 define :thinking_sphinx, {
   :name => nil,
   :app_path => nil,
   :port => nil,
   :owner => nil,
   :group => nil,
-  :rails_env => 'production'
+  :rails_env => 'production',
+  :monit => true
   } do
 
   app_name = params[:name]
@@ -70,19 +72,15 @@ define :thinking_sphinx, {
     action [:enable, :start]
   end
 
-  # template "/etc/monit/conf.d/#{app_name}-sphinx.conf" do
-  #   owner 'root'
-  #   group 'root'
-  #   mode 0700
-  #   source "sphinx.monit.erb"
-  #   variables :app_name => app_name
-  #   cookbook 'leonid_shevtsov'
-  #   notifies :restart, 'service[monit]'
-  #   notifies :run, "execute[enable-monit-#{app_name}-sphinx]"
-  # end
-
-  # execute "enable-monit-#{app_name}-sphinx" do
-  #   command "monit monitor #{app_name}-sphinx"
-  #   action :nothing
-  # end
+  if params[:monit]
+    template "/etc/monit/conf.d/#{app_name}-sphinx.conf" do
+      owner 'root'
+      group 'root'
+      mode 0700
+      source "sphinx.monit.erb"
+      variables :app_name => app_name
+      cookbook 'rails_helpers'
+      notifies :restart, 'service[monit]'
+    end
+  end
 end
