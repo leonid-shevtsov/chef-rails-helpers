@@ -84,7 +84,7 @@ define :thinking_sphinx, {
     end
 
     execute "enable-monit-#{app_name}-sphinx" do
-      command "monit monitor #{app_name}-sphinx"
+      command "monit monitor #{app_name}-sphinx; sleep 1"
       action :nothing
     end
   end

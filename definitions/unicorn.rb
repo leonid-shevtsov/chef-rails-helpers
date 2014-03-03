@@ -79,7 +79,7 @@ define :unicorn, {
     end
 
     execute "enable-monit-#{name}-unicorn" do
-      command "monit monitor #{name}-unicorn"
+      command "monit monitor #{name}-unicorn; sleep 1"
       action :nothing
     end
   end
