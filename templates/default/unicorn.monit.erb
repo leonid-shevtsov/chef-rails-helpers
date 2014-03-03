@@ -1,4 +1,4 @@
 check process <%=@app_name%>-unicorn with pidfile /home/<%=@app_name%>/apps/<%=@app_name%>/shared/tmp/pids/unicorn.pid
   start = "/etc/init.d/<%=@app_name%>-unicorn start"
   stop = "/etc/init.d/<%=@app_name%>-unicorn stop"
-  if 2 restarts within 3 cycles then timeout
+  if 2 restarts within 3 cycles then alert
