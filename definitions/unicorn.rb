@@ -68,12 +68,12 @@ define :unicorn, {
   end
 
   if params[:monit]
-    template "/etc/monit/conf.d/#{app_name}-unicorn.conf" do
+    template "/etc/monit/conf.d/#{name}-unicorn.conf" do
       owner 'root'
       group 'root'
       mode 0700
       source "unicorn.monit.erb"
-      variables :app_name => app_name
+      variables :app_name => name
       cookbook 'rails_helpers'
       notifies :restart, 'service[monit]'
     end
