@@ -1,0 +1,38 @@
+server {
+  listen <%=@port %>;
+  server_name <%= @server_name %>;
+
+  charset utf-8;
+
+  access_log  /var/log/nginx/<%= @app_name %>.access.log;
+  error_log  /var/log/nginx/<%= @app_name %>.error.log  warn;
+
+  root   <%= @public_path %>;
+
+  <%= @custom_config %>
+
+  # enable gzip compression
+  gzip on;
+  gzip_comp_level 9;
+  gzip_types text/plain text/css application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+  gzip_static on;
+  # proper caching for assets
+  location ~ ^/assets/ {
+    expires 1y;
+    add_header Cache-Control public;
+    add_header ETag "";
+    break;
+  }
+
+  passenger_enabled on;
+}
+
+<% if @alternate_names && !@alternate_names.empty? %>
+
+server {
+  listen <%=@port %>;
+  server_name <%= @alternate_names.join(' ') %>;
+  rewrite ^(.*)$ http://<%=@server_name%>$1;
+}
+
+<% end %>
