@@ -85,6 +85,7 @@ define :unicorn, {
     end
     service "#{name}-unicorn" do
       action [:stop, :disable]
+      only_if { File.exists? "/etc/init.d/#{name}-unicorn" }
     end
     file "/etc/init.d/#{name}-unicorn" do
       action :delete
